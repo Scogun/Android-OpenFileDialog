@@ -88,6 +88,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
         LinearLayout linearLayout = createMainLayout(context);
         linearLayout.addView(createBackItem(context));
         listView = createListView(context);
+        listView.setCacheColorHint(context.getResources().getColor(android.R.color.transparent));
         linearLayout.addView(listView);
         setCustomTitle(title)
                 .setView(linearLayout)
