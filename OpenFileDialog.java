@@ -48,6 +48,10 @@ public class OpenFileDialog extends AlertDialog.Builder {
             super(context, android.R.layout.simple_list_item_1, files);
         }
 
+        private int getColor(int color) {
+            return getContext().getResources().getColor(color);
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView view = (TextView) super.getView(position, convertView, parent);
@@ -56,12 +60,11 @@ public class OpenFileDialog extends AlertDialog.Builder {
                 view.setText(file.getName());
                 if (file.isDirectory()) {
                     setDrawable(view, folderIcon);
+                    view.setBackgroundColor(getColor(android.R.color.transparent));
                 } else {
                     setDrawable(view, fileIcon);
-                    if (selectedIndex == position)
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
-                    else
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
+                    view.setBackgroundColor((selectedIndex == position) ?
+                            getColor(android.R.color.holo_blue_dark) : getColor(android.R.color.transparent));
                 }
             }
             return view;
