@@ -36,6 +36,8 @@ public class OpenFileDialog extends AlertDialog.Builder {
     private Drawable fileIcon;
     private String accessDeniedMessage;
 
+    private final Context context;
+
     public interface OpenDialogListener {
         public void OnSelectedFile(String fileName);
     }
@@ -46,6 +48,10 @@ public class OpenFileDialog extends AlertDialog.Builder {
             super(context, android.R.layout.simple_list_item_1, files);
         }
 
+        private int getColor(int color) {
+            return getContext().getResources().getColor(color);
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView view = (TextView) super.getView(position, convertView, parent);
@@ -54,12 +60,11 @@ public class OpenFileDialog extends AlertDialog.Builder {
                 view.setText(file.getName());
                 if (file.isDirectory()) {
                     setDrawable(view, folderIcon);
+                    view.setBackgroundColor(getColor(android.R.color.transparent));
                 } else {
                     setDrawable(view, fileIcon);
-                    if (selectedIndex == position)
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
-                    else
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
+                    view.setBackgroundColor((selectedIndex == position) ?
+                            getColor(android.R.color.holo_blue_dark) : getColor(android.R.color.transparent));
                 }
             }
             return view;
@@ -79,11 +84,14 @@ public class OpenFileDialog extends AlertDialog.Builder {
 
     public OpenFileDialog(Context context) {
         super(context);
+        this.context = context;
+
         title = createTitle(context);
         changeTitle();
         LinearLayout linearLayout = createMainLayout(context);
         linearLayout.addView(createBackItem(context));
         listView = createListView(context);
+        listView.setCacheColorHint(context.getResources().getColor(android.R.color.transparent));
         linearLayout.addView(listView);
         setCustomTitle(title)
                 .setView(linearLayout)
@@ -101,7 +109,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
     @Override
     public AlertDialog show() {
         files.addAll(getFiles(currentPath));
-        listView.setAdapter(new FileAdapter(getContext(), files));
+        listView.setAdapter(new FileAdapter(this.context, files));
         return super.show();
     }
 
@@ -144,9 +152,13 @@ public class OpenFileDialog extends AlertDialog.Builder {
     }
 
     private static Point getScreenSize(Context context) {
-        Point screeSize = new Point();
-        getDefaultDisplay(context).getSize(screeSize);
-        return screeSize;
+        Point screenSize = new Point();
+        Display display = getDefaultDisplay(context);
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB_MR2) {
+            screenSize.set(display.getWidth(), display.getHeight());
+        } else
+            display.getSize(screenSize);
+        return screenSize;
     }
 
     private static int getLinearLayoutMinHeight(Context context) {
@@ -186,7 +198,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
 
     private TextView createBackItem(Context context) {
         TextView textView = createTextView(context, android.R.style.TextAppearance_DeviceDefault_Small);
-        Drawable drawable = getContext().getResources().getDrawable(android.R.drawable.ic_menu_directions);
+        Drawable drawable = context.getResources().getDrawable(android.R.drawable.ic_menu_directions);
         drawable.setBounds(0, 0, 60, 60);
         textView.setCompoundDrawables(drawable, null, null, null);
         textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -213,7 +225,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
 
     private void changeTitle() {
         String titleText = currentPath;
-        int screenWidth = getScreenSize(getContext()).x;
+        int screenWidth = getScreenSize(this.context).x;
         int maxWidth = (int) (screenWidth * 0.99);
         if (getTextWidth(titleText, title.getPaint()) > maxWidth) {
             while (getTextWidth("..." + titleText, title.getPaint()) > maxWidth) {
@@ -258,10 +270,10 @@ public class OpenFileDialog extends AlertDialog.Builder {
             adapter.notifyDataSetChanged();
             changeTitle();
         } catch (NullPointerException e) {
-            String message = getContext().getResources().getString(android.R.string.unknownName);
+            String message = this.context.getResources().getString(android.R.string.unknownName);
             if (!accessDeniedMessage.equals(""))
                 message = accessDeniedMessage;
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.context, message, Toast.LENGTH_SHORT).show();
         }
     }
 
