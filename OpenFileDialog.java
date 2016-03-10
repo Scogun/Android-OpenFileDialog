@@ -198,6 +198,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
                 File parentDirectory = file.getParentFile();
                 if (parentDirectory != null) {
                     currentPath = parentDirectory.getPath();
+                    selectedIndex = -1;
                     RebuildFiles(((FileAdapter) listView.getAdapter()));
                 }
             }
@@ -233,7 +234,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
         File directory = new File(directoryPath);
         File[] list = directory.listFiles(filenameFilter);
         if(list == null)
-            list = new File[]{};
+            return new ArrayList<File>();
         List<File> fileList = Arrays.asList(list);
         Collections.sort(fileList, new Comparator<File>() {
             @Override
