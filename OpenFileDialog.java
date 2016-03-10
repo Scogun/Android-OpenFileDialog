@@ -56,11 +56,11 @@ public class OpenFileDialog extends AlertDialog.Builder {
                     setDrawable(view, folderIcon);
                 } else {
                     setDrawable(view, fileIcon);
-                    if (selectedIndex == position)
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
-                    else
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
                 }
+                if (selectedIndex == position)
+                    view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
+                else
+                    view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
             }
             return view;
         }
@@ -198,7 +198,6 @@ public class OpenFileDialog extends AlertDialog.Builder {
                 File parentDirectory = file.getParentFile();
                 if (parentDirectory != null) {
                     currentPath = parentDirectory.getPath();
-                    selectedIndex = -1;
                     RebuildFiles(((FileAdapter) listView.getAdapter()));
                 }
             }
