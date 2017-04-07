@@ -35,6 +35,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
     private Drawable folderIcon;
     private Drawable fileIcon;
     private String accessDeniedMessage;
+    private boolean isOnlyFoldersFilter;
 
     public interface OpenDialogListener {
         public void OnSelectedFile(String fileName);
@@ -79,6 +80,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
 
     public OpenFileDialog(Context context) {
         super(context);
+        isOnlyFoldersFilter = false;
         title = createTitle(context);
         changeTitle();
         LinearLayout linearLayout = createMainLayout(context);
@@ -92,6 +94,9 @@ public class OpenFileDialog extends AlertDialog.Builder {
                     public void onClick(DialogInterface dialog, int which) {
                         if (selectedIndex > -1 && listener != null) {
                             listener.OnSelectedFile(listView.getItemAtPosition(selectedIndex).toString());
+                        }
+                        if (listener != null && isOnlyFoldersFilter) {
+                            listener.OnSelectedFile(currentPath);
                         }
                     }
                 })
@@ -114,6 +119,19 @@ public class OpenFileDialog extends AlertDialog.Builder {
                 if (tempFile.isFile())
                     return tempFile.getName().matches(filter);
                 return true;
+            }
+        };
+        return this;
+    }
+
+    public OpenFileDialog setOnlyFoldersFilter() {
+        isOnlyFoldersFilter = true;
+        filenameFilter = new FilenameFilter() {
+
+            @Override
+            public boolean accept(File file, String fileName) {
+                File tempFile = new File(String.format("%s/%s", file.getPath(), fileName));
+                return tempFile.isDirectory();
             }
         };
         return this;
