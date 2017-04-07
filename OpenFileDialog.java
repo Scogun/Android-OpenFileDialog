@@ -57,11 +57,11 @@ public class OpenFileDialog extends AlertDialog.Builder {
                     setDrawable(view, folderIcon);
                 } else {
                     setDrawable(view, fileIcon);
-                    if (selectedIndex == position)
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
-                    else
-                        view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
                 }
+                if (selectedIndex == position)
+                    view.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
+                else
+                    view.setBackgroundColor(getContext().getResources().getColor(android.R.color.transparent));
             }
             return view;
         }
@@ -251,7 +251,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
         File directory = new File(directoryPath);
         File[] list = directory.listFiles(filenameFilter);
         if(list == null)
-            list = new File[]{};
+            return new ArrayList<File>();
         List<File> fileList = Arrays.asList(list);
         Collections.sort(fileList, new Comparator<File>() {
             @Override
